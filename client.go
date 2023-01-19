@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"google.golang.org/grpc"
+
 	"pmapp/api/hello"
 )
 
@@ -13,12 +14,6 @@ const (
 	address = "localhost:8080"
 	name    = "world"
 )
-
-func main() {
-	Hello()
-	//    Reboot()
-	Monitor()
-}
 
 type Credential struct {
 	Payload map[string]string
@@ -33,12 +28,12 @@ func NewCredential() *Credential {
 	}
 }
 
-func (this *Credential) GetRequestMetadata(ctx context.Context, data ...string) (map[string]string, error) {
+func (cred *Credential) GetRequestMetadata(ctx context.Context, data ...string) (map[string]string, error) {
 	var err error
-	return this.Payload, err
+	return cred.Payload, err
 }
 
-func (this *Credential) RequireTransportSecurity() bool {
+func (cred *Credential) RequireTransportSecurity() bool {
 	return false
 }
 
@@ -104,4 +99,10 @@ func Monitor() {
 		measure, _ := monitor.Recv()
 		log.Println(measure)
 	}
+}
+
+func main() {
+	Hello()
+	//Reboot()
+	Monitor()
 }

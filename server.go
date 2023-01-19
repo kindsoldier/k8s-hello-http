@@ -20,13 +20,17 @@ type SystemServer struct {
 	hello.UnimplementedSystemServer
 }
 
-func (this *SystemServer) Reboot(ctx context.Context, request *hello.EmptyRequest) (*hello.EmptyReply, error) {
+func NewSystemServer() *SystemServer {
+	return &SystemServer{}
+}
+
+func (sysServ *SystemServer) Reboot(ctx context.Context, request *hello.EmptyRequest) (*hello.EmptyReply, error) {
 	var err error
 	log.Println("call reboot")
 	return &hello.EmptyReply{}, err
 }
 
-func (this *SystemServer) Monitor(srv hello.System_MonitorServer) error {
+func (sysServ *SystemServer) Monitor(srv hello.System_MonitorServer) error {
 	var err error
 	log.Println("call monitor")
 	for {
@@ -46,22 +50,18 @@ func (this *SystemServer) Monitor(srv hello.System_MonitorServer) error {
 	return err
 }
 
-func NewSystemServer() *SystemServer {
-	return &SystemServer{}
-}
-
-func (this *HelloServer) Hello(ctx context.Context, request *hello.HelloRequest) (*hello.HelloReply, error) {
-	var err error
-	log.Printf("requst name: %v", request.GetName())
-	return &hello.HelloReply{Message: "hello " + request.GetName()}, err
-}
-
 type HelloServer struct {
 	hello.UnimplementedHelloServer
 }
 
 func NewHelloServer() *HelloServer {
 	return &HelloServer{}
+}
+
+func (helloServ *HelloServer) Hello(ctx context.Context, request *hello.HelloRequest) (*hello.HelloReply, error) {
+	var err error
+	log.Printf("requst name: %v", request.GetName())
+	return &hello.HelloReply{ Message: "hello " + request.GetName() }, err
 }
 
 func unaryInterceptor(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
