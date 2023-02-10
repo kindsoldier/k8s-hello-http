@@ -3,8 +3,8 @@ package main
 import (
 	"log"
 	"net"
-    "sync"
-    "time"
+	"sync"
+	"time"
 
 	pbHello "pmapp/api/hello"
 
@@ -14,7 +14,6 @@ import (
 const (
 	port = ":8080"
 )
-
 
 type HelloServer struct {
 	pbHello.UnimplementedHelloServer
@@ -28,47 +27,46 @@ func (helloServ *HelloServer) Install(req *pbHello.InstallRequest, stream pbHell
 	var err error
 	log.Println("call install:", req)
 
-    var wg sync.WaitGroup
-    doneChan := make(chan bool)
+	var wg sync.WaitGroup
+	doneChan := make(chan bool)
 
-    aliveFunc := func() {
-        defer wg.Done()
-        for {
-            select {
-            case <- doneChan:
-                return
-            default:
-                time.Sleep(1 * time.Second)
-            }
-            log.Println("send alive response")
-            intermRes := pbHello.InstallResult{
-                Done: false,
-            }
-            err = stream.Send(&intermRes)
-            if err != nil {
-                return
-            }
-        }
-    }
-    wg.Add(1)
-    go aliveFunc()
+	aliveFunc := func() {
+		defer wg.Done()
+		for {
+			select {
+			case <-doneChan:
+				return
+			default:
+				time.Sleep(1 * time.Second)
+			}
+			log.Println("send alive response")
+			intermRes := pbHello.InstallResult{
+				Done: false,
+			}
+			err = stream.Send(&intermRes)
+			if err != nil {
+				return
+			}
+		}
+	}
+	wg.Add(1)
+	go aliveFunc()
 
-    time.Sleep(10 * time.Second)
+	time.Sleep(10 * time.Second)
 
-    doneChan <- true
-    wg.Wait()
+	doneChan <- true
+	wg.Wait()
 
-    doneRes := pbHello.InstallResult{
-        Done: true,
-    }
-    err = stream.Send(&doneRes)
-    if err != nil {
-        return err
-    }
+	doneRes := pbHello.InstallResult{
+		Done: true,
+	}
+	err = stream.Send(&doneRes)
+	if err != nil {
+		return err
+	}
 
 	return err
 }
-
 
 func main() {
 	var err error
