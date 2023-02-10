@@ -17,7 +17,7 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type HelloClient interface {
-	Hello(ctx context.Context, in *HelloRequest, opts ...grpc.CallOption) (*HelloReply, error)
+	Install(ctx context.Context, in *InstallRequest, opts ...grpc.CallOption) (Hello_InstallClient, error)
 }
 
 type helloClient struct {
@@ -28,20 +28,43 @@ func NewHelloClient(cc grpc.ClientConnInterface) HelloClient {
 	return &helloClient{cc}
 }
 
-func (c *helloClient) Hello(ctx context.Context, in *HelloRequest, opts ...grpc.CallOption) (*HelloReply, error) {
-	out := new(HelloReply)
-	err := c.cc.Invoke(ctx, "/services.Hello/Hello", in, out, opts...)
+func (c *helloClient) Install(ctx context.Context, in *InstallRequest, opts ...grpc.CallOption) (Hello_InstallClient, error) {
+	stream, err := c.cc.NewStream(ctx, &_Hello_serviceDesc.Streams[0], "/services.Hello/Install", opts...)
 	if err != nil {
 		return nil, err
 	}
-	return out, nil
+	x := &helloInstallClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+type Hello_InstallClient interface {
+	Recv() (*InstallResult, error)
+	grpc.ClientStream
+}
+
+type helloInstallClient struct {
+	grpc.ClientStream
+}
+
+func (x *helloInstallClient) Recv() (*InstallResult, error) {
+	m := new(InstallResult)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
 }
 
 // HelloServer is the server API for Hello service.
 // All implementations must embed UnimplementedHelloServer
 // for forward compatibility
 type HelloServer interface {
-	Hello(context.Context, *HelloRequest) (*HelloReply, error)
+	Install(*InstallRequest, Hello_InstallServer) error
 	mustEmbedUnimplementedHelloServer()
 }
 
@@ -49,8 +72,8 @@ type HelloServer interface {
 type UnimplementedHelloServer struct {
 }
 
-func (UnimplementedHelloServer) Hello(context.Context, *HelloRequest) (*HelloReply, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Hello not implemented")
+func (UnimplementedHelloServer) Install(*InstallRequest, Hello_InstallServer) error {
+	return status.Errorf(codes.Unimplemented, "method Install not implemented")
 }
 func (UnimplementedHelloServer) mustEmbedUnimplementedHelloServer() {}
 
@@ -65,184 +88,36 @@ func RegisterHelloServer(s *grpc.Server, srv HelloServer) {
 	s.RegisterService(&_Hello_serviceDesc, srv)
 }
 
-func _Hello_Hello_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(HelloRequest)
-	if err := dec(in); err != nil {
-		return nil, err
+func _Hello_Install_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(InstallRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
 	}
-	if interceptor == nil {
-		return srv.(HelloServer).Hello(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/services.Hello/Hello",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(HelloServer).Hello(ctx, req.(*HelloRequest))
-	}
-	return interceptor(ctx, in, info, handler)
+	return srv.(HelloServer).Install(m, &helloInstallServer{stream})
+}
+
+type Hello_InstallServer interface {
+	Send(*InstallResult) error
+	grpc.ServerStream
+}
+
+type helloInstallServer struct {
+	grpc.ServerStream
+}
+
+func (x *helloInstallServer) Send(m *InstallResult) error {
+	return x.ServerStream.SendMsg(m)
 }
 
 var _Hello_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "services.Hello",
 	HandlerType: (*HelloServer)(nil),
-	Methods: []grpc.MethodDesc{
-		{
-			MethodName: "Hello",
-			Handler:    _Hello_Hello_Handler,
-		},
-	},
-	Streams:  []grpc.StreamDesc{},
-	Metadata: "hello.proto",
-}
-
-// SystemClient is the client API for System service.
-//
-// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-type SystemClient interface {
-	Reboot(ctx context.Context, in *EmptyRequest, opts ...grpc.CallOption) (*EmptyReply, error)
-	Monitor(ctx context.Context, opts ...grpc.CallOption) (System_MonitorClient, error)
-}
-
-type systemClient struct {
-	cc grpc.ClientConnInterface
-}
-
-func NewSystemClient(cc grpc.ClientConnInterface) SystemClient {
-	return &systemClient{cc}
-}
-
-func (c *systemClient) Reboot(ctx context.Context, in *EmptyRequest, opts ...grpc.CallOption) (*EmptyReply, error) {
-	out := new(EmptyReply)
-	err := c.cc.Invoke(ctx, "/services.System/Reboot", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *systemClient) Monitor(ctx context.Context, opts ...grpc.CallOption) (System_MonitorClient, error) {
-	stream, err := c.cc.NewStream(ctx, &_System_serviceDesc.Streams[0], "/services.System/Monitor", opts...)
-	if err != nil {
-		return nil, err
-	}
-	x := &systemMonitorClient{stream}
-	return x, nil
-}
-
-type System_MonitorClient interface {
-	Send(*EmptyRequest) error
-	Recv() (*Measure, error)
-	grpc.ClientStream
-}
-
-type systemMonitorClient struct {
-	grpc.ClientStream
-}
-
-func (x *systemMonitorClient) Send(m *EmptyRequest) error {
-	return x.ClientStream.SendMsg(m)
-}
-
-func (x *systemMonitorClient) Recv() (*Measure, error) {
-	m := new(Measure)
-	if err := x.ClientStream.RecvMsg(m); err != nil {
-		return nil, err
-	}
-	return m, nil
-}
-
-// SystemServer is the server API for System service.
-// All implementations must embed UnimplementedSystemServer
-// for forward compatibility
-type SystemServer interface {
-	Reboot(context.Context, *EmptyRequest) (*EmptyReply, error)
-	Monitor(System_MonitorServer) error
-	mustEmbedUnimplementedSystemServer()
-}
-
-// UnimplementedSystemServer must be embedded to have forward compatible implementations.
-type UnimplementedSystemServer struct {
-}
-
-func (UnimplementedSystemServer) Reboot(context.Context, *EmptyRequest) (*EmptyReply, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Reboot not implemented")
-}
-func (UnimplementedSystemServer) Monitor(System_MonitorServer) error {
-	return status.Errorf(codes.Unimplemented, "method Monitor not implemented")
-}
-func (UnimplementedSystemServer) mustEmbedUnimplementedSystemServer() {}
-
-// UnsafeSystemServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to SystemServer will
-// result in compilation errors.
-type UnsafeSystemServer interface {
-	mustEmbedUnimplementedSystemServer()
-}
-
-func RegisterSystemServer(s *grpc.Server, srv SystemServer) {
-	s.RegisterService(&_System_serviceDesc, srv)
-}
-
-func _System_Reboot_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(EmptyRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(SystemServer).Reboot(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/services.System/Reboot",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(SystemServer).Reboot(ctx, req.(*EmptyRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _System_Monitor_Handler(srv interface{}, stream grpc.ServerStream) error {
-	return srv.(SystemServer).Monitor(&systemMonitorServer{stream})
-}
-
-type System_MonitorServer interface {
-	Send(*Measure) error
-	Recv() (*EmptyRequest, error)
-	grpc.ServerStream
-}
-
-type systemMonitorServer struct {
-	grpc.ServerStream
-}
-
-func (x *systemMonitorServer) Send(m *Measure) error {
-	return x.ServerStream.SendMsg(m)
-}
-
-func (x *systemMonitorServer) Recv() (*EmptyRequest, error) {
-	m := new(EmptyRequest)
-	if err := x.ServerStream.RecvMsg(m); err != nil {
-		return nil, err
-	}
-	return m, nil
-}
-
-var _System_serviceDesc = grpc.ServiceDesc{
-	ServiceName: "services.System",
-	HandlerType: (*SystemServer)(nil),
-	Methods: []grpc.MethodDesc{
-		{
-			MethodName: "Reboot",
-			Handler:    _System_Reboot_Handler,
-		},
-	},
+	Methods:     []grpc.MethodDesc{},
 	Streams: []grpc.StreamDesc{
 		{
-			StreamName:    "Monitor",
-			Handler:       _System_Monitor_Handler,
+			StreamName:    "Install",
+			Handler:       _Hello_Install_Handler,
 			ServerStreams: true,
-			ClientStreams: true,
 		},
 	},
 	Metadata: "hello.proto",

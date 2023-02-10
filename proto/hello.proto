@@ -1,32 +1,19 @@
 syntax = "proto3";
 
-//import "google/protobuf/empty.proto";
-
 option go_package = "api/hello";
 
 package services;
 
 service Hello {
-  rpc Hello (HelloRequest) returns (HelloReply) {}
-}
-message HelloRequest {
-  string name = 1;
-}
-message HelloReply {
-  string message = 1;
+  rpc Install(InstallRequest) returns (stream InstallResult) {};
 }
 
-
-service System {
-  rpc Reboot(EmptyRequest) returns (EmptyReply) {};
-  rpc Monitor(stream EmptyRequest) returns (stream Measure) {};
-}
-message Measure {
-    uint64 power = 1;
+message InstallRequest {
+    string Hostname = 1;
+    int32 Port = 2;
 }
 
-message EmptyRequest {
+message InstallResult {
+    bool Done = 1;
 }
 
-message EmptyReply {
-}
