@@ -34,7 +34,8 @@ func (helloServ *HelloServer) Install(req *pbHello.InstallRequest, stream pbHell
 		defer wg.Done()
 		for {
 			select {
-			case <-doneChan:
+            case <-doneChan:
+                log.Println("cancel alive func")
 				return
 			default:
 				time.Sleep(1 * time.Second)
@@ -45,6 +46,7 @@ func (helloServ *HelloServer) Install(req *pbHello.InstallRequest, stream pbHell
 			}
 			err = stream.Send(&intermRes)
 			if err != nil {
+                log.Println("send alive error")
 				return
 			}
 		}
@@ -53,6 +55,7 @@ func (helloServ *HelloServer) Install(req *pbHello.InstallRequest, stream pbHell
 	go aliveFunc()
 
 	time.Sleep(10 * time.Second)
+    log.Println("installation is finished!")
 
 	doneChan <- true
 	wg.Wait()

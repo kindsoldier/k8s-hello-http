@@ -3,36 +3,37 @@
 ### Server side
 
 ```
-$ ./server
-2023/02/10 15:25:42 server listening at [::]:8080
-2023/02/10 15:25:48 call install: Hostname:"localhost"  Port:12345
-2023/02/10 15:25:49 send alive response
-2023/02/10 15:25:50 send alive response
-2023/02/10 15:25:51 send alive response
-2023/02/10 15:25:52 send alive response
-2023/02/10 15:25:53 send alive response
-2023/02/10 15:25:54 send alive response
-2023/02/10 15:25:55 send alive response
-2023/02/10 15:25:56 send alive response
-2023/02/10 15:25:57 send alive response
-2023/02/10 15:25:58 send alive response
-
+# ./server
+2023/02/10 16:17:39 server listening at [::]:8080
+2023/02/10 16:17:46 call install: Hostname:"localhost"  Port:12345
+2023/02/10 16:17:47 send alive response
+2023/02/10 16:17:48 send alive response
+2023/02/10 16:17:49 send alive response
+2023/02/10 16:17:50 send alive response
+2023/02/10 16:17:51 send alive response
+2023/02/10 16:17:52 send alive response
+2023/02/10 16:17:53 send alive response
+2023/02/10 16:17:54 send alive response
+2023/02/10 16:17:55 send alive response
+2023/02/10 16:17:56 installation is finished!
+2023/02/10 16:17:56 send alive response
+2023/02/10 16:17:56 cancel alive func
 ```
 
 ### Client side
 
 ```
-$ ./client
-2023/02/10 15:25:49 installation is incomplete
-2023/02/10 15:25:50 installation is incomplete
-2023/02/10 15:25:51 installation is incomplete
-2023/02/10 15:25:52 installation is incomplete
-2023/02/10 15:25:53 installation is incomplete
-2023/02/10 15:25:54 installation is incomplete
-2023/02/10 15:25:55 installation is incomplete
-2023/02/10 15:25:56 installation is incomplete
-2023/02/10 15:25:57 installation is incomplete
-2023/02/10 15:25:58 installation is incomplete
-2023/02/10 15:25:58 installation is incomplete
-2023/02/10 15:25:58 installation is finished!
+# ./client
+2023/02/10 16:17:47 installation is incomplete
+2023/02/10 16:17:48 installation is incomplete
+2023/02/10 16:17:49 installation is incomplete
+2023/02/10 16:17:50 installation is incomplete
+2023/02/10 16:17:51 installation is incomplete
+2023/02/10 16:17:52 installation is incomplete
+2023/02/10 16:17:53 installation is incomplete
+2023/02/10 16:17:54 installation is incomplete
+2023/02/10 16:17:55 installation is incomplete
+2023/02/10 16:17:56 installation is incomplete
+2023/02/10 16:17:56 installation is incomplete
+2023/02/10 16:17:56 installation is finished!
 ```
