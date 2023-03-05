@@ -1,7 +1,7 @@
-FROM debian
+FROM baseos:v1
 
-WORKDIR /app
-ADD ./client /app/client
+WORKDIR /usr/local/bin
+ADD ./client /usr/local.bin/client
 
-CMD [ "/app/client" ]
+CMD [ "/usr/local.bin/client" ]
 

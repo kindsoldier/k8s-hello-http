@@ -1,5 +1,6 @@
 
 
+
 KUBECTL = k3s kubectl
 CTR = k3s ctr
 DOCKER = podman
@@ -9,6 +10,11 @@ GENDIR=.
 
 all: build-server build-client
 
+
+baseos: 
+	$(DOCKER) image build -t localhost/baseos:v1 -f baseos.docker .
+
+
 install-go:
 	mkdir -p /usr/local/bin
 	cd /usr/local && \
@@ -16,13 +22,13 @@ install-go:
 	  tar xzf go.tar.gz
 	cd /usr/local/bin/ && ln -sf ../go/bin/* .
 
-#install-go-tools:
-#	go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
-#	mkdir -p  /usr/local/bin
-#	install ~/go/bin/protoc-gen-go-grpc /usr/local/bin
+install-go-tools:
+	go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
+	mkdir -p  /usr/local/bin
+	install ~/go/bin/protoc-gen-go-grpc /usr/local/bin
 
-#genrpc:
-#	protoc --proto_path=proto --go_out=$(GENDIR) --go-grpc_out=$(GENDIR) proto/*.proto
+genrpc:
+	protoc --proto_path=proto --go_out=$(GENDIR) --go-grpc_out=$(GENDIR) proto/*.proto
 
 build-server:
 	CGO_ENABLED=0 go build -o server server.go
@@ -40,14 +46,14 @@ install-server: build-server
 	rm -f server.tar
 #	$(KUBECTL) delete -f server.yaml; true
 #	$(KUBECTL) apply -f server.yaml
+#	$(KUBECTL) get pod
+#	$(KUBECTL) get svc
 	helm install server charts/server
-	$(KUBECTL) get pod -A
-	$(KUBECTL) get svc -A
 
 
 show:
-	$(KUBECTL) get pod -A
-	$(KUBECTL) get svc -A
+	$(KUBECTL) get pod
+	$(KUBECTL) get svc
 
 install-client: build-client
 	$(DOCKER) image build -t localhost/client:v2 -f client.docker .
@@ -84,14 +90,15 @@ make-descr:
 	helm template client charts/client/ > client.yaml
 	helm template server charts/server/ > server.yaml
 
-k3s-install:
+install-k3s:
 	curl -sfL https://get.k3s.io | sh
 
-k3s-install-wo:
+install-k3s-wo:
 	curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="--no-deploy traefik" sh
 
-k3s-uninstall:
+uninstall-k3s:
 	k3s-uninstall.sh
+
 
 install-utils:
 	sudo apt-get update
@@ -107,3 +114,8 @@ clean: local-clean
 local-clean:
 	rm -f server client *~
 	rm -f *.tar
+
+
+clean-images:
+	podman system prune --all --force
+	podman rmi --all --force

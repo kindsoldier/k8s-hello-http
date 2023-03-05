@@ -1,8 +1,9 @@
 #FROM scratch
-FROM alpine
+#FROM debian:bullseye-backports
+FROM baseos:v1
 
-WORKDIR /app
-ADD ./server /app/server
+WORKDIR /usr/local/bin
+ADD ./server /usr/local.bin/server
 
-CMD [ "/app/server" ]
+CMD [ "/usr/local.bin/server" ]
 
