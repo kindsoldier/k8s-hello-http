@@ -4,7 +4,25 @@ KUBECTL = k3s kubectl
 CTR = k3s ctr
 DOCKER = podman
 
+GENDIR=.
+
+
 all: build-server build-client
+
+install-go:
+	mkdir -p /usr/local/bin
+	cd /usr/local && \
+	  wget -O go.tar.gz https://go.dev/dl/go1.20.1.linux-amd64.tar.gz && \
+	  tar xzf go.tar.gz
+	cd /usr/local/bin/ && ln -sf ../go/bin/* .
+
+#install-go-tools:
+#	go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
+#	mkdir -p  /usr/local/bin
+#	install ~/go/bin/protoc-gen-go-grpc /usr/local/bin
+
+#genrpc:
+#	protoc --proto_path=proto --go_out=$(GENDIR) --go-grpc_out=$(GENDIR) proto/*.proto
 
 build-server:
 	CGO_ENABLED=0 go build -o server server.go
@@ -22,14 +40,14 @@ install-server: build-server
 	rm -f server.tar
 #	$(KUBECTL) delete -f server.yaml; true
 #	$(KUBECTL) apply -f server.yaml
-#	$(KUBECTL) get pod
-#	$(KUBECTL) get svc
 	helm install server charts/server
+	$(KUBECTL) get pod -A
+	$(KUBECTL) get svc -A
 
 
 show:
-	$(KUBECTL) get pod
-	$(KUBECTL) get svc
+	$(KUBECTL) get pod -A
+	$(KUBECTL) get svc -A
 
 install-client: build-client
 	$(DOCKER) image build -t localhost/client:v2 -f client.docker .
@@ -83,8 +101,6 @@ install-utils:
 	sudo apt-get install -y protoc-gen-go
 	sudo apt-get install -y helm
 	sudo apt-get install -y kubectl
-
-
 
 clean: local-clean 
 
