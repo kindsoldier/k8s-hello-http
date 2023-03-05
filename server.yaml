@@ -1,10 +1,27 @@
+---
+# Source: server-chart/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+    name: server
+    namespace: default
+spec:
+    selector:
+      app: server
+    ports:
+    - port: 9001
+      protocol: TCP
+      targetPort: 9001
+    type: LoadBalancer
+---
+# Source: server-chart/templates/deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: server
-  labels:
+  namespace: default
 spec:
-  replicas: 1
+  replicas: 3
   selector:
     matchLabels:
       app: server
@@ -18,35 +35,6 @@ spec:
           imagePullPolicy: Never
           name: server
           ports:
-            - containerPort: 8080
+            - containerPort: 9001
               protocol: TCP
       restartPolicy: Always
----
-apiVersion: v1
-kind: Service
-metadata:
-    name: server
-    namespace: default
-spec:
-    selector:
-      app: server
-    ports:
-    - port: 8080
-      protocol: TCP
-      targetPort: 8080
-    type: LoadBalancer
-#---
-#apiVersion: v1
-#kind: Service
-#metadata:
-#  name: server
-#spec:
-#  selector:
-#    app: server
-#  ports:
-#    - name: server
-#      port: 8080
-#      targetPort: 8080
-#      protocol: TCP
-#      nodePort: 39901
-#  type: NodePort

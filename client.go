@@ -1,13 +1,14 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"time"
 )
 
 const (
-	port = 8080
+	port = 9001
 	host = "server"
 )
 
@@ -15,7 +16,7 @@ func main() {
 	log.Println("start client")
 
 	for {
-		uri := fmt.Sprintf("http://%s:%s", host, port)
+		uri := fmt.Sprintf("http://%s:%d", host, port)
 		resp, err := http.Get(uri)
 		if err != nil {
 			log.Println("request error:", err)

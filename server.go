@@ -1,18 +1,23 @@
 package main
 
 import (
-    "fmt"
-    "log"
-    "net/http"
+	"fmt"
+	"log"
+	"net/http"
+)
+
+const (
+	port = 9001
 )
 
 func main() {
-    log.Println("start service")
-    http.HandleFunc("/", HelloServer)
-    http.ListenAndServe(":8080", nil)
+	address := fmt.Sprintf(":%d", port)
+	log.Println("start service on", address)
+	http.HandleFunc("/", HelloServer)
+	http.ListenAndServe(address, nil)
 }
 
 func HelloServer(w http.ResponseWriter, r *http.Request) {
-    log.Println("hello request")
-    fmt.Fprintf(w, "Hello!\n")
+	log.Println("Got hello request")
+	fmt.Fprintf(w, "Hello!\n")
 }

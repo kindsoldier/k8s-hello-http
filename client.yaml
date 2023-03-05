@@ -1,52 +1,12 @@
-apiVersion: apps/v1
-kind: Deployment
+---
+# Source: client-chart/templates/pod.yaml
+apiVersion: v1
+kind: Pod
 metadata:
   name: client
-  labels:
+  namespace: default
 spec:
-  replicas: 3
-  selector:
-    matchLabels:
-      app: client
-  template:
-    metadata:
-      labels:
-        app: client
-    spec:
-      containers:
-        - image: localhost/client:v2
-          imagePullPolicy: Never
-          name: client
-          ports:
-            - containerPort: 80
-              protocol: TCP
-      restartPolicy: Always
----
-apiVersion: v1
-kind: Service
-metadata:
-    name: client
-    namespace: default
-spec:
-    selector:
-      app: client
-#    ports:
-#    - port: 9002
-#      protocol: TCP
-#      targetPort: 9002
-#    type: LoadBalancer
-#---
-#apiVersion: v1
-#kind: Service
-#metadata:
-#  name: client
-#spec:
-#  selector:
-#    app: client
-#  ports:
-#    - name: client
-#      port: 9001
-#      targetPort: 9001
-#      protocol: TCP
-#      nodePort: 39901
-#  type: NodePort
+  containers:
+    - name: client
+      image: localhost/client:v2
+      imagePullPolicy: Never
