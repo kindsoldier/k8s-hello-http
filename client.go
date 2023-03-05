@@ -1,56 +1,28 @@
 package main
 
 import (
-	"context"
 	"log"
-	//"time"
-
-	"google.golang.org/grpc"
-
-	pbHello "pmapp/api/hello"
+	"net/http"
+	"time"
 )
 
 const (
-	address = "localhost:8080"
+	port = 8080
+	host = "server"
 )
 
-func Install() error {
-	var err error
-
-	conn, err := grpc.Dial(address, grpc.WithInsecure(), grpc.WithBlock())
-	if err != nil {
-		return err
-	}
-	defer conn.Close()
-
-	req := pbHello.InstallRequest{
-		Hostname: "localhost",
-		Port:     12345,
-	}
-
-	pbClient := pbHello.NewHelloClient(conn)
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-	//ctx, _ := context.WithTimeout(context.Background(), 5 * time.Second)
-	stream, err := pbClient.Install(ctx, &req)
-	if err != nil {
-		return err
-	}
+func main() {
+	log.Println("start client")
 
 	for {
-		res, err := stream.Recv()
+		uri := fmt.Sprintf("http://%s:%s", host, port)
+		resp, err := http.Get(uri)
 		if err != nil {
-			return err
+			log.Println("request error:", err)
 		}
-		log.Println("installation is incomplete")
-		if res.Done {
-			log.Println("installation is finished!")
-			break
-		}
-	}
-	return err
-}
+		resp.Body.Close()
 
-func main() {
-	Install()
+		log.Println("response status:", resp.Status)
+		time.Sleep(1 * time.Second)
+	}
 }

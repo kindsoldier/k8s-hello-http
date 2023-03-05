@@ -1,0 +1,7 @@
+FROM debian
+
+WORKDIR /app
+ADD ./client /app/client
+
+CMD [ "/app/client" ]
+

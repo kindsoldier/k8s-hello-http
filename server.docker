@@ -1,0 +1,9 @@
+#FROM scratch
+FROM alpine
+
+
+WORKDIR /app
+ADD ./server /app/server
+
+CMD [ "/app/server" ]
+

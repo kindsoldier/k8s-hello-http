@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: server
+  labels:
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: server
+  template:
+    metadata:
+      labels:
+        app: server
+    spec:
+      containers:
+        - image: localhost/server:v2
+          imagePullPolicy: Never
+          name: server
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+    name: server
+    namespace: default
+spec:
+    selector:
+      app: server
+    ports:
+    - port: 8080
+      protocol: TCP
+      targetPort: 8080
+    type: LoadBalancer
+#---
+#apiVersion: v1
+#kind: Service
+#metadata:
+#  name: server
+#spec:
+#  selector:
+#    app: server
+#  ports:
+#    - name: server
+#      port: 8080
+#      targetPort: 8080
+#      protocol: TCP
+#      nodePort: 39901
+#  type: NodePort
