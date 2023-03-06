@@ -99,6 +99,24 @@ install-k3s-wo:
 uninstall-k3s:
 	k3s-uninstall.sh
 
+install-k0s:
+	curl -sSLf https://get.k0s.sh | sh
+	wget -O k0s https://github.com/k0sproject/k0s/releases/download/v1.26.2+k0s.0/k0s-v1.26.2+k0s.0-amd64
+	install k0s /usr/local/bin
+#	k0s config create > k0s.yaml
+#	k0s install controller -c k0s.yaml
+	k0s install controller --single
+	k0s start
+
+config-k0s:
+	mkdir -p ~/.kube
+	k0s kubeconfig admin > kubeconf.yaml
+	cp kubeconf.yaml ~/.kube/config
+
+deinstall-k0s:
+	k0s stop; true
+	k0s reset
+	rm -f /usr/local/bin/k0s
 
 install-utils:
 	sudo apt-get update
