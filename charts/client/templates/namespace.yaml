@@ -1,0 +1,8 @@
+{{- if ne .Values.namespace "default" }}
+kind: Namespace
+apiVersion: v1
+metadata:
+  name: {{ .Values.namespace }}
+  labels:
+    name: server
+{{- end }}

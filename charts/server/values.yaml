@@ -1,0 +1,10 @@
+
+namespace: default
+
+service:
+  name: server
+  type: LoadBalancer
+  port: 9001
+  image: localhost/server:v2
+
+

@@ -1,0 +1,7 @@
+apiVersion: v2
+name: client-chart
+description: Client chart
+type: application
+version: 0.1.0
+appVersion: "1.16.0"
+

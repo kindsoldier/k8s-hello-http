@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: server
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: server
+  template:
+    metadata:
+      labels:
+        app: server
+    spec:
+      containers:
+        - image: {{ .Values.service.image }}
+          imagePullPolicy: Never
+          name: server
+          ports:
+            - containerPort: {{ .Values.service.port }}
+              protocol: TCP
+      restartPolicy: Always

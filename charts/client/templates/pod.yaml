@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: client
+  namespace: {{ .Values.namespace }}
+spec:
+  containers:
+    - name: client
+      image: {{ .Values.image }}
+      imagePullPolicy: Never

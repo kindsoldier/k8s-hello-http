@@ -1,0 +1,6 @@
+
+namespace: default
+
+image: localhost/client:v2
+
+
